@@ -1,16 +1,16 @@
 var express = require("express");
-var router = express.Router();
+var usersRouter = express.Router();
 const Users = require("../models/users");
 var bodyParser = require("body-parser");
-router.use(bodyParser.json());
+usersRouter.use(bodyParser.json());
 
 /* GET users listing. Will edit for admin uses */
-router.get("/", function (req, res, next) {
+usersRouter.get("/", function (req, res, next) {
   res.send("respond with a resource");
 });
 
-router.post('/signup', (req, res, next) => {
-  User.findOne({username: req.body.username})
+usersRouter.post('/signup', (req, res, next) => {
+  Users.findOne({username: req.body.username})
   .then((user) => {
     if(user != null) {
       var err = new Error('User ' + req.body.username + ' already exists!');
@@ -18,7 +18,7 @@ router.post('/signup', (req, res, next) => {
       next(err);
     }
     else {
-      return User.create({
+      return Users.create({
         username: req.body.username,
         password: req.body.password});
     }
@@ -31,7 +31,7 @@ router.post('/signup', (req, res, next) => {
   .catch((err) => next(err));
 });
 
-router.post('/login', (req, res, next) => {
+usersRouter.post('/login', (req, res, next) => {
 
   if(!req.session.user) {
     var authHeader = req.headers.authorization;
@@ -47,7 +47,7 @@ router.post('/login', (req, res, next) => {
     var username = auth[0];
     var password = auth[1];
   
-    User.findOne({username: username})
+    Users.findOne({username: username})
     .then((user) => {
       if (user === null) {
         var err = new Error('User ' + username + ' does not exist!');
@@ -75,7 +75,7 @@ router.post('/login', (req, res, next) => {
   }
 })
 
-router.get('/logout', (req, res) => {
+usersRouter.get('/logout', (req, res) => {
   if (req.session) {
     req.session.destroy();
     res.clearCookie('session-id');
@@ -89,4 +89,4 @@ router.get('/logout', (req, res) => {
 });
 
 
-module.exports = router;
+module.exports = usersRouter;
