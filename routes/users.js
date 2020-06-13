@@ -6,9 +6,22 @@ usersRouter.use(bodyParser.json());
 var passport = require("passport");
 var authenticate = require("../authenticate");
 /* GET users listing. Will edit for admin uses */
-usersRouter.get("/", function (req, res, next) {
-  res.send("respond with a resource");
-});
+usersRouter.route("/")
+  .get(authenticate.verifyUser,authenticate.verifyAdmin,(req, res, next) => {
+    
+    Users.find({})
+     
+      .then(
+        (users) => {
+          res.statusCode = 200;
+          res.setHeader("Content-Type", "application/json");
+          res.json(users);
+        },
+        (err) => next(err)
+      )
+      .catch((err) => next(err));
+  })
+
 
 usersRouter.post("/signup", (req, res, next) => {
   Users.register(
