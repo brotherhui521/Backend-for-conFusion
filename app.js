@@ -15,8 +15,18 @@ var usersRouter = require("./routes/users");
 var dishRouter = require("./routes/dishRouter");
 var leaderRouter = require("./routes/leaderRouter");
 var promotionRouter = require("./routes/promotionRouter");
+var uploadRouter =require("./routes/uploadRouter");
 
 var app = express();
+
+app.all('*',(req,res, next)=>{
+  if(req.secure){
+    return next();
+  }
+  else{
+    res.redirect(307,'https://'+req.hostname+':'+app.get('secPort')+req.url);
+  }
+})
 
 const mongoose = require("mongoose");
 const Dishes = require("./models/dishes");
@@ -67,7 +77,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
 //basic authorization
-/*
+ /*
 function auth(req, res, next) {
   console.log(req.user);
 
@@ -80,14 +90,15 @@ function auth(req, res, next) {
   }
 }
 app.use(auth);
-
 */
+
 app.use(express.static(path.join(__dirname, "public")));
 //app.use(express.static(__dirname+'/public'));
 
 app.use("/dishes", dishRouter);
 app.use("/promotions", promotionRouter);
 app.use("/leaders", leaderRouter);
+app.use("/imageUpload", uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
